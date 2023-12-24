@@ -6,35 +6,37 @@ import numpy as np
 import torch
 import torch.backends.cudnn as cudnn
 from networks.vision_transformer import SwinUnet as ViT_seg
-from trainer import trainer_synapse
+from trainer import trainer_tod
 from config import get_config
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--root_path', type=str,
-                    default='../data/Synapse/train_npz', help='root dir for data')
+                    default='/home/yujun/Dataset/tod_dataset/data/', help='root dir for data')
 parser.add_argument('--dataset', type=str,
-                    default='Synapse', help='experiment_name')
+                    default='Tod', help='experiment_name')
 parser.add_argument('--list_dir', type=str,
                     default='./lists/lists_Synapse', help='list dir')
 parser.add_argument('--num_classes', type=int,
                     default=9, help='output channel of network')
-parser.add_argument('--output_dir', type=str, help='output dir')                   
+parser.add_argument('--output_dir', type=str, default='./logger', help='output dir')                   
 parser.add_argument('--max_iterations', type=int,
                     default=30000, help='maximum epoch number to train')
 parser.add_argument('--max_epochs', type=int,
                     default=150, help='maximum epoch number to train')
 parser.add_argument('--batch_size', type=int,
-                    default=24, help='batch_size per gpu')
+                    default=1, help='batch_size per gpu')
 parser.add_argument('--n_gpu', type=int, default=1, help='total gpu')
 parser.add_argument('--deterministic', type=int,  default=1,
                     help='whether use deterministic training')
 parser.add_argument('--base_lr', type=float,  default=0.01,
                     help='segmentation network learning rate')
 parser.add_argument('--img_size', type=int,
-                    default=224, help='input patch size of network input')
+                    default=512, help='input patch size of network input')
 parser.add_argument('--seed', type=int,
                     default=1234, help='random seed')
-parser.add_argument('--cfg', type=str, required=True, metavar="FILE", help='path to config file', )
+parser.add_argument('--cfg', type=str,
+                    default='configs/swin_tiny_patch4_window8_512_lite.yaml',
+                    metavar="FILE", help='path to config file', )
 parser.add_argument(
         "--opts",
         help="Modify config options by adding 'KEY VALUE' pairs. ",
@@ -57,8 +59,6 @@ parser.add_argument('--eval', action='store_true', help='Perform evaluation only
 parser.add_argument('--throughput', action='store_true', help='Test throughput only')
 
 args = parser.parse_args()
-if args.dataset == "Synapse":
-    args.root_path = os.path.join(args.root_path, "train_npz")
 config = get_config(args)
 
 
@@ -77,10 +77,10 @@ if __name__ == "__main__":
 
     dataset_name = args.dataset
     dataset_config = {
-        'Synapse': {
+        'Tod': {
             'root_path': args.root_path,
-            'list_dir': './lists/lists_Synapse',
-            'num_classes': 9,
+            'list_dir': './lists/lists_Synapse',   # useless here
+            'num_classes': 1,
         },
     }
 
@@ -93,7 +93,11 @@ if __name__ == "__main__":
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
     net = ViT_seg(config, img_size=args.img_size, num_classes=args.num_classes).cuda()
+    ###### test pseudo input
+    pseudo_input = torch.randn(4, 1, 512, 512).cuda()
+    pseudo_output = net(pseudo_input)
+    ######
     net.load_from(config)
 
-    trainer = {'Synapse': trainer_synapse,}
+    trainer = {'Tod': trainer_tod}
     trainer[dataset_name](args, net, args.output_dir)

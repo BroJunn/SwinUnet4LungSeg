@@ -9,15 +9,14 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from tensorboardX import SummaryWriter
-from torch.nn.modules.loss import CrossEntropyLoss
+from torch.nn.modules.loss import MSELoss
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from utils import DiceLoss
-from torchvision import transforms
-from utils import test_single_volume
 
-def trainer_synapse(args, model, snapshot_path):
-    from datasets.dataset_synapse import Synapse_dataset, RandomGenerator
+
+
+def trainer_tod(args, model, snapshot_path):
+    from datasets.dataset_tod import Tod_dataset
     logging.basicConfig(filename=snapshot_path + "/log.txt", level=logging.INFO,
                         format='[%(asctime)s.%(msecs)03d] %(message)s', datefmt='%H:%M:%S')
     logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
@@ -26,9 +25,7 @@ def trainer_synapse(args, model, snapshot_path):
     num_classes = args.num_classes
     batch_size = args.batch_size * args.n_gpu
     # max_iterations = args.max_iterations
-    db_train = Synapse_dataset(base_dir=args.root_path, list_dir=args.list_dir, split="train",
-                               transform=transforms.Compose(
-                                   [RandomGenerator(output_size=[args.img_size, args.img_size])]))
+    db_train = Tod_dataset(path_dir=os.path.join(args.root_path, 'train'))
     print("The length of train set is: {}".format(len(db_train)))
 
     def worker_init_fn(worker_id):
@@ -39,8 +36,7 @@ def trainer_synapse(args, model, snapshot_path):
     if args.n_gpu > 1:
         model = nn.DataParallel(model)
     model.train()
-    ce_loss = CrossEntropyLoss()
-    dice_loss = DiceLoss(num_classes)
+    mse_loss = MSELoss()
     optimizer = optim.SGD(model.parameters(), lr=base_lr, momentum=0.9, weight_decay=0.0001)
     writer = SummaryWriter(snapshot_path + '/log')
     iter_num = 0
@@ -51,12 +47,11 @@ def trainer_synapse(args, model, snapshot_path):
     iterator = tqdm(range(max_epoch), ncols=70)
     for epoch_num in iterator:
         for i_batch, sampled_batch in enumerate(trainloader):
-            image_batch, label_batch = sampled_batch['image'], sampled_batch['label']
-            image_batch, label_batch = image_batch.cuda(), label_batch.cuda()
-            outputs = model(image_batch)
-            loss_ce = ce_loss(outputs, label_batch[:].long())
-            loss_dice = dice_loss(outputs, label_batch, softmax=True)
-            loss = 0.4 * loss_ce + 0.6 * loss_dice
+            input, gt = sampled_batch['input'], sampled_batch['gt']
+            input, gt = input.unsqueeze(1), gt.unsqueeze(1)
+            input, gt = input.cuda(), gt.cuda()
+            outputs = model(input)
+            loss = mse_loss(outputs, gt)
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -66,22 +61,23 @@ def trainer_synapse(args, model, snapshot_path):
 
             iter_num = iter_num + 1
             writer.add_scalar('info/lr', lr_, iter_num)
-            writer.add_scalar('info/total_loss', loss, iter_num)
-            writer.add_scalar('info/loss_ce', loss_ce, iter_num)
+            writer.add_scalar('info/loss_mse', loss, iter_num)
 
-            logging.info('iteration %d : loss : %f, loss_ce: %f' % (iter_num, loss.item(), loss_ce.item()))
+            logging.info('iteration %d : loss : %f' % (iter_num, loss.item()))
 
-            if iter_num % 20 == 0:
-                image = image_batch[1, 0:1, :, :]
-                image = (image - image.min()) / (image.max() - image.min())
-                writer.add_image('train/Image', image, iter_num)
-                outputs = torch.argmax(torch.softmax(outputs, dim=1), dim=1, keepdim=True)
-                writer.add_image('train/Prediction', outputs[1, ...] * 50, iter_num)
-                labs = label_batch[1, ...].unsqueeze(0) * 50
-                writer.add_image('train/GroundTruth', labs, iter_num)
+            if iter_num % 200 == 0:
+                image_input = input[0, 0:1, :, :]
+                image_input = (image_input - image_input.min()) / (image_input.max() - image_input.min())
+                writer.add_image('train/Image_input', image_input, iter_num)
+                image_output = outputs[0, 0:1, :, :]
+                image_output = (image_output - image_output.min()) / (image_output.max() - image_output.min())
+                writer.add_image('train/Image_output', image_output, iter_num)
+                image_gt = gt[0, 0:1, :, :]
+                image_gt = (image_gt - image_gt.min()) / (image_gt.max() - image_gt.min())
+                writer.add_image('train/Image_gt', image_gt, iter_num)
 
         save_interval = 50  # int(max_epoch/6)
-        if epoch_num > int(max_epoch / 2) and (epoch_num + 1) % save_interval == 0:
+        if (epoch_num + 1) % save_interval == 0:
             save_mode_path = os.path.join(snapshot_path, 'epoch_' + str(epoch_num) + '.pth')
             torch.save(model.state_dict(), save_mode_path)
             logging.info("save model to {}".format(save_mode_path))
