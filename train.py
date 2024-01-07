@@ -11,7 +11,7 @@ from config import get_config
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--root_path', type=str,
-                    default='/home/yujun/Dataset/tod_dataset/data/', help='root dir for data')
+                    default='/root/code/tod_dataset1/data', help='root dir for data')
 parser.add_argument('--dataset', type=str,
                     default='Tod', help='experiment_name')
 parser.add_argument('--list_dir', type=str,
@@ -22,13 +22,13 @@ parser.add_argument('--output_dir', type=str, default='./logger', help='output d
 parser.add_argument('--max_iterations', type=int,
                     default=30000, help='maximum epoch number to train')
 parser.add_argument('--max_epochs', type=int,
-                    default=150, help='maximum epoch number to train')
+                    default=50, help='maximum epoch number to train')
 parser.add_argument('--batch_size', type=int,
-                    default=1, help='batch_size per gpu')
+                    default=8, help='batch_size per gpu')
 parser.add_argument('--n_gpu', type=int, default=1, help='total gpu')
 parser.add_argument('--deterministic', type=int,  default=1,
                     help='whether use deterministic training')
-parser.add_argument('--base_lr', type=float,  default=0.01,
+parser.add_argument('--base_lr', type=float,  default=0.001,
                     help='segmentation network learning rate')
 parser.add_argument('--img_size', type=int,
                     default=512, help='input patch size of network input')
@@ -94,8 +94,8 @@ if __name__ == "__main__":
         os.makedirs(args.output_dir)
     net = ViT_seg(config, img_size=args.img_size, num_classes=args.num_classes).cuda()
     ###### test pseudo input
-    pseudo_input = torch.randn(4, 1, 512, 512).cuda()
-    pseudo_output = net(pseudo_input)
+    # pseudo_input = torch.randn(4, 1, 512, 512).cuda()
+    # pseudo_output = net(pseudo_input)
     ######
     net.load_from(config)
 
