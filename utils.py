@@ -3,7 +3,7 @@ import torch
 from medpy import metric
 from scipy.ndimage import zoom
 import torch.nn as nn
-import SimpleITK as sitk
+# import SimpleITK as sitk
 
 
 class DiceLoss(nn.Module):
