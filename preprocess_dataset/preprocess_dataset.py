@@ -86,9 +86,9 @@ class PreprocessDataset:
 
 if __name__ == '__main__':
     A = PreprocessDataset(
-        '/home/yujun/Dataset/covid-19_xray_dataset/covid-19-xray-dataset/annotations/all-images',
-        '/home/yujun/Dataset/covid-19_xray_dataset/covid-19-xray-dataset/annotations/all-images-semantic-masks',
-        '/home/yujun/Dataset/covid-19_xray_dataset/covid-19-xray-dataset/data'
+        'covid-19-xray-dataset/annotations/all-images',
+        'covid-19-xray-dataset/annotations/all-images-semantic-masks',
+        'covid-19-xray-dataset/data'
     )
     A.download_all_iamges()
     A.resize_all_img_n_mask((768, 512))

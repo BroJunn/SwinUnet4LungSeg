@@ -2,20 +2,30 @@
 
 The code is reproduced from the repository (https://github.com/HuCaoFighting/Swin-Unet) for segmentation of lung based on a dataset from 
 
-## 1. Download pre-trained swin transformer model (Swin-T)
-* [Get pre-trained model in this link] (https://drive.google.com/drive/folders/1UC3XOoezeum0uck4KBVGa8osahs6rKUY?usp=sharing): Put pretrained Swin-T into folder "pretrained_ckpt/"
-
-## 2. Prepare data
+## 1. Prepare data
 
 
-## 3. Environment
+You can directly download the preprocessed datset here (https://drive.google.com/file/d/1fv_Uf1JbiC5aMTTzb69JkQQxeQxTnGrX/view?usp=drive_link):
+
+
+
+Or you can use the provided script to preprocess it with your own desired configurations, e.g. the size of images and the ratio for train-val-test.
+
+- clone the repository: (https://github.com/v7labs/covid-19-xray-dataset/tree/master)
+- run the script 
+
+```bash
+python preprocess_dataset/preprocess_dataset.py
+```
+
+## 2. Environment
 
 - Please prepare an environment with python=3.7, and then use the following command for the dependencies.
 
 ```bash
 pip install torch torchvision numpy tqdm tensorboard tensorboardX scipy h5py timm einops opencv-python scikit-learn six yacs
 ```
-## 4. Train/Test
+## 3. Train/Test
 
 
 - A trained ckpt from scratch is saved [here](assets/ckpt/epoch_100th.pth), which is trained based on 4 batch-size for 100 epochs with a step scheduler lr decent strategy.
