@@ -1,6 +1,6 @@
 # Swin-Unet for Lung Segmentation
 
-The code is reproduced from the repository (https://github.com/HuCaoFighting/Swin-Unet) for segmentation of lung based on a dataset from 
+The code is reproduced from the repository (https://github.com/HuCaoFighting/Swin-Unet) for segmentation of lung based on a dataset from the repository (https://github.com/v7labs/covid-19-xray-dataset/tree/master).
 
 ## 1. Prepare data
 

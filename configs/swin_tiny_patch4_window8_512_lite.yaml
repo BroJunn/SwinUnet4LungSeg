@@ -2,7 +2,7 @@ MODEL:
   TYPE: swin
   NAME: swin_tiny_patch4_window8_512
   DROP_PATH_RATE: 0.2
-  PRETRAIN_CKPT: logger/20240128101431/epoch_59.pth
+  PRETRAIN_CKPT: assets/ckpt/epoch_100th.pth
   SWIN:
     FINAL_UPSAMPLE: "expand_first"
     EMBED_DIM: 96

@@ -11,7 +11,7 @@ from config import get_config
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--root_path', type=str,
-                    default='/root/autodl-tmp/data', help='root dir for data')
+                    default='/home/yujun/Dataset/covid-19_xray_dataset/covid-19-xray-dataset/data', help='root dir for data')
 parser.add_argument('--dataset', type=str,
                     default='covid-19', help='experiment_name')
 parser.add_argument('--output_dir', type=str, default='./logger', help='output dir')  \
