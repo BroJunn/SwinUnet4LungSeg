@@ -23,9 +23,9 @@ _C.DATA.BATCH_SIZE = 128
 # Path to dataset, could be overwritten by command line argument
 _C.DATA.DATA_PATH = ''
 # Dataset name
-_C.DATA.DATASET = 'tod'
+_C.DATA.DATASET = 'covid-19'
 # Input image size
-_C.DATA.IMG_SIZE = 512
+_C.DATA.IMG_SIZE = (512, 768)
 # Interpolation to resize image (random, bilinear, bicubic)
 _C.DATA.INTERPOLATION = 'bicubic'
 # Use zipped dataset instead of folder dataset
@@ -47,8 +47,8 @@ _C.MODEL.TYPE = 'swin'
 # Model name
 _C.MODEL.NAME = 'swin_tiny_patch4_window7_224'
 # Checkpoint to resume, could be overwritten by command line argument
-_C.MODEL.PRETRAIN_CKPT = './pretrained_ckpt/swin_tiny_patch4_window7_224.pth'
-_C.MODEL.RESUME = ''
+_C.MODEL.PRETRAIN_CKPT = 'logger/20240128193454/epoch_99.pth'
+_C.MODEL.RESUME = 'logger/20240128193454/epoch_99.pth'
 # Number of classes, overwritten in data preparation
 _C.MODEL.NUM_CLASSES = 1000
 # Dropout rate

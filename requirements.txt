@@ -4,10 +4,11 @@ numpy
 tqdm
 tensorboard
 tensorboardX
-ml-collections
-medpy
-SimpleITK
 scipy
 h5py
 timm
 einops
+opencv-python
+scikit-learn
+six
+yacs
