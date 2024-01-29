@@ -47,8 +47,8 @@ _C.MODEL.TYPE = 'swin'
 # Model name
 _C.MODEL.NAME = 'swin_tiny_patch4_window7_224'
 # Checkpoint to resume, could be overwritten by command line argument
-_C.MODEL.PRETRAIN_CKPT = 'logger/20240128193454/epoch_99.pth'
-_C.MODEL.RESUME = 'logger/20240128193454/epoch_99.pth'
+_C.MODEL.PRETRAIN_CKPT = 'assets/ckpt/epoch_100th.pth'
+_C.MODEL.RESUME = 'assets/ckpt/epoch_100th.pth'
 # Number of classes, overwritten in data preparation
 _C.MODEL.NUM_CLASSES = 1000
 # Dropout rate
